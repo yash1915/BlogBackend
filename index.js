@@ -14,7 +14,7 @@ require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin: [ "https://myblogapp.netlify.app"], // tumhare frontend URLs
+  origin: [ "https://rococo-rabanadas-59f0c8.netlify.app/"], // tumhare frontend URLs
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
 };
