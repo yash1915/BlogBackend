@@ -18,14 +18,14 @@ const corsOptions = {
   methods: "GET,POST,PUT,DELETE",
   credentials: true,
 };
-app.use(cors(corsOptions));
 
 
 // -------------------- MIDDLEWARE --------------------
 
 // middleware lagaya hai jo incoming request ke body me agar JSON data ho to usko parse karke req.body me daal dega
 app.use(express.json());
-app.use(cors());      
+app.use(cors(corsOptions));
+     
 
 
 // routes import kar rahe hai (routes/blog.js file se)
