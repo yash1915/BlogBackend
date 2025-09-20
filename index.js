@@ -1,36 +1,45 @@
-// Express ko import kar rahe hai (web framework jo routes, middleware handle karta hai)
 const express = require('express');
-
-// Express aur cors ka instance bana rahe hai
-const app = express();
-const cors = require("cors");
-
-// dotenv ko import karke config call kar rahe hai 
+const cors = require('cors');
 require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const fileUpload = require('express-fileupload');
+const { cloudinaryConnect } = require('./config/cloudinary');
+const dbConnect = require('./config/database');
 
-// PORT environment variable se le rahe hai
-const PORT = process.env.PORT || 3000;
 
-// -------------------- MIDDLEWARE --------------------
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
 app.use(express.json());
+app.use(cors({
+    origin: "*", // Aap production me ise apne frontend URL se replace kar sakte hain
+    credentials: true,
+}));
+app.use(cookieParser());
+app.use(fileUpload({
+    useTempFiles: true,
+    tempFileDir: '/tmp/'
+}));
 app.use(cors());
 
-// -------------------- ROUTES IMPORT --------------------
-const blogRoutes = require('./routes/blog'); // sabhi routes yaha handle honge
-
-// -------------------- ROUTES MOUNT --------------------
-app.use("/api/v1", blogRoutes);
-
-// -------------------- DATABASE CONNECT --------------------
-const dbConnect = require('./config/database');
+// Database & Cloudinary Connection
 dbConnect();
+cloudinaryConnect();
 
-// -------------------- START SERVER --------------------
+// Routes
+const blogRoutes = require('./routes/blog');
+const authRoutes = require('./routes/auth');
+app.use("/api/v1", blogRoutes);
+app.use("/api/v1/auth", authRoutes);
+
+// Default Route
+app.get('/', (req, res) => {
+    res.send(`<h1>🚀 Blog API is Running...</h1>`);
+});
+
+// Start Server
 app.listen(PORT, () => {
-    console.log(`✅ App is Running at PORT ${PORT}`);
+    console.log(`✅ Server started at http://localhost:${PORT}`);
 });
 
-// -------------------- DEFAULT ROUTE --------------------
-app.get('/', (req,res) => {
-    res.send(`<h1>HomePage</h1>`);
-});

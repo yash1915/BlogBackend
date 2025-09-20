@@ -1,44 +1,39 @@
 const express = require("express");
 const router = express.Router();
 
-// -------------------- CONTROLLERS --------------------
 const { 
-  createPost, 
-  getAllPosts, 
-  getPostById, 
-  deletePost,
-  updatePost            // ✅ update bhi add kar diya
+  createPost, getAllPosts, getPostById, deletePost, updatePost,getPostsByUserId
 } = require("../controllers/postController");
 
 const { 
-  toggleLike            // ✅ ek hi like/unlike function
+  togglePostLike, toggleCommentLike 
 } = require("../controllers/likeController");
 
 const { 
-  createComment, 
-  getCommentsByPost, 
-  deleteComment
+  createComment, getCommentsByPost, deleteComment,updateComment
 } = require("../controllers/commentController");
 
-// -------------------- POST ROUTES --------------------
-router.post("/posts/create", createPost);
+const { auth } = require("../middleware/authMiddleware");
+
+// Yahan multer ki zaroorat nahi hai kyunki hum 'express-fileupload' use kar rahe hain.
+
+// --- POST ROUTES ---
+router.post("/posts/create", auth, createPost); // File upload 'express-fileupload' handle karega
 router.get("/posts", getAllPosts);
 router.get("/posts/:id", getPostById);
-router.put("/posts/:id", updatePost);       // ✅ update route
-router.delete("/posts/:id", deletePost);
+router.put("/posts/:id", auth, updatePost);
+router.delete("/posts/:id", auth, deletePost);
+router.get("/posts/user/:userId", auth, getPostsByUserId);
 
-// -------------------- LIKE ROUTE (Toggle) --------------------
-router.post("/likes/toggle", toggleLike);   // ✅ like/unlike same endpoint
+// --- LIKE ROUTES ---
+router.post("/posts/:postId/toggle-like", auth, togglePostLike);
+router.post("/comments/:commentId/toggle-like", auth, toggleCommentLike);
 
-// -------------------- COMMENT ROUTES --------------------
-router.post("/comments/create", createComment);
-router.get("/comments/:postId", getCommentsByPost);
-router.delete("/comments/:id", deleteComment);
+// --- COMMENT ROUTES ---
+router.post("/comments/create", auth, createComment);
+router.get("/posts/:postId/comments", getCommentsByPost);
+router.put("/comments/:commentId", auth, updateComment);
+router.delete("/comments/:id", auth, deleteComment);
 
-// -------------------- TEST ROUTE --------------------
-router.get("/posts/test", (req, res) => {
-  res.json({ message: "✅ Test route is working!" });
-});
-
-// -------------------- EXPORT --------------------
 module.exports = router;
+

@@ -1,50 +1,71 @@
 const Post = require("../models/postModel");
+const Comment = require("../models/commentModel");
 
-// -------------------- TOGGLE LIKE --------------------
-exports.toggleLike = async (req, res) => {
+// Like/Unlike a POST
+exports.togglePostLike = async (req, res) => {
   try {
-    const { post, user } = req.body;
+    const { postId } = req.params;
+    const userId = req.user.id;
 
-    if (!post || !user) {
-      return res.status(400).json({
-        success: false,
-        error: "Post ID and user are required",
-      });
-    }
-
-    // post find karo
-    const postDoc = await Post.findById(post);
-    if (!postDoc) {
+    const post = await Post.findById(postId);
+    if (!post) {
       return res.status(404).json({ success: false, error: "Post not found" });
     }
 
-    // check if user already liked
-    const alreadyLiked = postDoc.likes.some(like => like.user === user);
+    const alreadyLikedIndex = post.likes.indexOf(userId);
 
-    if (alreadyLiked) {
-      // unlike: remove user from likes
-      postDoc.likes = postDoc.likes.filter(like => like.user !== user);
+    if (alreadyLikedIndex > -1) {
+      // Unlike
+      post.likes.splice(alreadyLikedIndex, 1);
     } else {
-      // like: add new like
-      postDoc.likes.push({ user });
+      // Like
+      post.likes.push(userId);
     }
 
-    // save post with updated likes
-    await postDoc.save();
+    await post.save();
+    const populatedPost = await Post.findById(postId).populate("likes", "firstName lastName");
 
     return res.status(200).json({
       success: true,
-      message: alreadyLiked ? "Post unliked successfully" : "Post liked successfully",
-      likesCount: postDoc.likes.length,
-      post: postDoc,
+      message: alreadyLikedIndex > -1 ? "Post unliked" : "Post liked",
+      post: populatedPost
     });
 
   } catch (err) {
-    console.error("❌ Error in toggleLike:", err.message);
-    return res.status(500).json({
-      success: false,
-      error: "Error while toggling like",
-      details: err.message,
-    });
+    return res.status(500).json({ success: false, error: "Error while toggling like on post" });
   }
+};
+
+// Like/Unlike a COMMENT
+exports.toggleCommentLike = async (req, res) => {
+    try {
+        const { commentId } = req.params;
+        const userId = req.user.id;
+
+        const comment = await Comment.findById(commentId);
+        if(!comment) {
+            return res.status(404).json({ success: false, error: "Comment not found" });
+        }
+
+        const alreadyLikedIndex = comment.likes.indexOf(userId);
+
+        if (alreadyLikedIndex > -1) {
+            // Unlike
+            comment.likes.splice(alreadyLikedIndex, 1);
+        } else {
+            // Like
+            comment.likes.push(userId);
+        }
+        
+        await comment.save();
+
+        return res.status(200).json({
+            success: true,
+            message: alreadyLikedIndex > -1 ? "Comment unliked" : "Comment liked",
+            comment
+        });
+
+    } catch (err) {
+        return res.status(500).json({ success: false, error: "Error while toggling like on comment" });
+    }
 };
