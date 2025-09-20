@@ -130,7 +130,7 @@ exports.forgotPassword = async (req, res) => {
         user.resetPasswordToken = token;
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
         await user.save();
-        const resetUrl = `http://127.0.0.1:5500/frontend/html/reset.html?token=${token}`;
+        const resetUrl = `http://127.0.0.1:5501/frontend/html/reset.html?token=${token}`;
                 // EMAIL MESSAGE ME ALERT ADD KIYA GAYA HAI
         const emailBody = `
             <p>Click this link to reset your password: <a href="${resetUrl}">${resetUrl}</a></p>
