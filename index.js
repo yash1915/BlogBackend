@@ -16,6 +16,7 @@ const corsOptions = {
   origin: 'https://rococo-rabanadas-59f0c8.netlify.app', // Allow your frontend to access
   optionsSuccessStatus: 200 
 };
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(fileUpload({
     useTempFiles: true,
@@ -35,7 +36,7 @@ app.use("/api/v1/auth", authRoutes);
 
 // Default Route
 app.get('/', (req, res) => {
-    res.send(`<h1>🚀 Blog API is Running...</h1>`);
+    res.send(`<h1> Blog API is Running...</h1>`);
 });
 
 // Start Server
