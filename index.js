@@ -21,7 +21,7 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: '/tmp/'
 }));
-app.use(cors());
+
 
 // Database & Cloudinary Connection
 dbConnect();
