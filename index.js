@@ -12,10 +12,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-    origin: "*", // Aap production me ise apne frontend URL se replace kar sakte hain
-    credentials: true,
-}));
+const corsOptions = {
+  origin: 'https://rococo-rabanadas-59f0c8.netlify.app', // Allow your frontend to access
+  optionsSuccessStatus: 200 
+};
 app.use(cookieParser());
 app.use(fileUpload({
     useTempFiles: true,
